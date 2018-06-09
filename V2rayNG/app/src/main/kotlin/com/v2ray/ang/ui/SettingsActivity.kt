@@ -62,9 +62,9 @@ class SettingsActivity : BaseActivity() {
                 startActivity<RoutingSettingsActivity>()
             }
 
-            donate.onClick {
-                startActivity<InappBuyActivity>()
-            }
+//            donate.onClick {
+//                startActivity<InappBuyActivity>()
+//            }
 
 //            licenses.onClick {
 //                val fragment = LicensesDialogFragment.Builder(act)

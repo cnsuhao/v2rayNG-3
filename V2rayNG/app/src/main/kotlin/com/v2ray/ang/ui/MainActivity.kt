@@ -197,7 +197,7 @@ class MainActivity : BaseActivity() {
                     .addCategory(Intent.CATEGORY_DEFAULT)
                     .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP), requestCode)
         } catch (e: Exception) {
-            RxPermissions(this)
+            RxPermissions.getInstance(this)
                     .request(Manifest.permission.CAMERA)
                     .subscribe {
                         if (it)
@@ -322,7 +322,7 @@ class MainActivity : BaseActivity() {
      * read content from uri
      */
     private fun readContentFromUri(uri: Uri) {
-        RxPermissions(this)
+        RxPermissions.getInstance(this)
                 .request(Manifest.permission.READ_EXTERNAL_STORAGE)
                 .subscribe {
                     if (it) {
