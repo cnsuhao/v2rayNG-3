@@ -19,7 +19,7 @@ class AngApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        LeakCanary.install(this)
+        //LeakCanary.install(this)
 
         firstRun = defaultSharedPreferences.getInt(PREF_LAST_VERSION, 0) != BuildConfig.VERSION_CODE
         if (firstRun)
