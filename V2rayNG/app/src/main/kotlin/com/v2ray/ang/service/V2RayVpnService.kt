@@ -10,7 +10,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.graphics.Color
-//import android.net.ConnectivityManager
 import android.net.VpnService
 import android.os.*
 import android.support.annotation.RequiresApi
@@ -18,10 +17,10 @@ import android.support.v4.app.NotificationCompat
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.extension.defaultDPreference
-//import com.v2ray.ang.receiver.NetWorkStateReceiver
 import com.v2ray.ang.ui.MainActivity
 import com.v2ray.ang.ui.PerAppProxyActivity
 import com.v2ray.ang.ui.SettingsActivity
+import com.v2ray.ang.util.AssetsUtil
 import com.v2ray.ang.util.MessageUtil
 import com.v2ray.ang.util.Utils
 import libv2ray.Libv2ray
@@ -37,7 +36,11 @@ class V2RayVpnService : VpnService() {
 
         fun startV2Ray(context: Context) {
             val intent = Intent(context.applicationContext, V2RayVpnService::class.java)
-            context.startService(intent)
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N_MR1) {
+                context.startForegroundService(intent)
+            } else {
+                context.startService(intent)
+            }
         }
     }
 
@@ -81,9 +84,10 @@ class V2RayVpnService : VpnService() {
 
         builder.setSession(defaultDPreference.getPrefString(AppConfig.PREF_CURR_CONFIG_NAME, ""))
 
-        val dnsServers = Utils.getDnsServers()
-        for (dns in dnsServers)
+        val dnsServers = Utils.getRemoteDnsServers(defaultDPreference)
+        for (dns in dnsServers) {
             builder.addDnsServer(dns)
+        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP &&
                 defaultDPreference.getPrefBoolean(SettingsActivity.PREF_PER_APP_PROXY, false)) {
@@ -130,9 +134,10 @@ class V2RayVpnService : VpnService() {
         v2rayPoint.vpnSupportReady()
         if (v2rayPoint.isRunning) {
             MessageUtil.sendMsg2UI(this, AppConfig.MSG_STATE_START_SUCCESS, "")
-            showNotification()
+//            showNotification()
         } else {
             MessageUtil.sendMsg2UI(this, AppConfig.MSG_STATE_START_FAILURE, "")
+            cancelNotification()
         }
     }
 
@@ -167,10 +172,14 @@ class V2RayVpnService : VpnService() {
             v2rayPoint.configureFile = "V2Ray_internal/ConfigureFileContent"
             v2rayPoint.configureFileContent = configContent
 
+            //next gen tun2ray
+//            v2rayPoint.upgradeToContext()
+//            v2rayPoint.optinNextGenerationTunInterface()
+
             v2rayPoint.runLoop()
         }
 
-        //  showNotification()
+        showNotification()
     }
 
     private fun stopV2Ray(isForced: Boolean = true) {
@@ -202,8 +211,18 @@ class V2RayVpnService : VpnService() {
     }
 
     private fun restartV2Ray() {
-        stopV2Ray(false)
-        startV2ray(true)
+        try {
+            //use custom geo dat
+//            val path = AssetsUtil.getAssetPath(this, "geoip.dat")
+//            Libv2ray.setAssetsOverride("geoip.dat", path)
+//
+//            val path2 = AssetsUtil.getAssetPath(this, "geosite.dat")
+//            Libv2ray.setAssetsOverride("geosite.dat", path2)
+
+            stopV2Ray(false)
+            startV2ray(true)
+        } catch (e: Exception) {
+        }
     }
 
     private fun restartV2RaySoft() {
@@ -239,7 +258,7 @@ class V2RayVpnService : VpnService() {
                 }
 
         val notification = NotificationCompat.Builder(applicationContext, channelId)
-                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSmallIcon(R.drawable.ic_v)
                 .setContentTitle(defaultDPreference.getPrefString(AppConfig.PREF_CURR_CONFIG_NAME, ""))
                 .setContentText(getString(R.string.notification_action_more))
                 .setPriority(NotificationCompat.PRIORITY_MIN)

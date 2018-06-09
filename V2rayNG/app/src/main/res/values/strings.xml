@@ -35,7 +35,8 @@
     <string name="server_lab_network">network</string>
     <string name="server_lab_more_function">more function</string>
     <string name="server_lab_head_type">head type</string>
-    <string name="server_lab_request_host">request host/ws path/ws(path;host)</string>
+    <string name="server_lab_request_host">request host(host/ws host/h2 host)</string>
+    <string name="server_lab_path">path(ws path/h2 path)</string>
     <string name="server_lab_stream_security">tls</string>
     <string name="toast_success">Success</string>
     <string name="toast_failure">Failure</string>
@@ -62,14 +63,14 @@
     <string name="title_about">About</string>
     <string name="title_advanced">Advanced Settings</string>
 
-    <string name="title_pref_bypass_mainland">Bypass mainland</string>
-    <string name="summary_pref_bypass_mainland">Bypass mainland</string>
-
     <string name="title_pref_per_app_proxy">Per-app proxy</string>
     <string name="summary_pref_per_app_proxy">Per-app proxy mode only support Android 5.0 Lollipop or higher</string>
 
     <string name="title_pref_mux_enabled">Enable Mux</string>
     <string name="summary_pref_mux_enabled">Enable maybe speed up network and switch network maybe flash</string>
+
+    <string name="title_pref_routing">Routing</string>
+    <string name="summary_pref_routing">Custom routing</string>
 
     <string name="title_pref_donate">Donate</string>
     <string name="summary_pref_donate">Donate developer</string>
@@ -77,6 +78,9 @@
 
     <string name="title_pref_remote_dns">Remote DNS</string>
     <string name="summary_pref_remote_dns">Remote DNS</string>
+
+    <string name="title_pref_speedup_domain">Speedup domain name resolution</string>
+    <string name="summary_pref_speedup_domain">Valid only for http/tls</string>
 
     <string name="title_pref_feedback">Feedback</string>
     <string name="summary_pref_feedback">Feedback enhancements or bugs to GitHub</string>
@@ -89,15 +93,37 @@
     <string name="donate_error_purchase2">Error Purchase,Authenticity verification failed.</string>
     <string name="donate_success_purchase">Thank you for your donation!</string>
     <string name="donate_item_click">Donate</string>
+    <string name="donate_item_paypal">Paypal</string>
 
     <string name="title_logcat">Logcat</string>
     <string name="logcat_copy">Copy</string>
+    <string name="title_export_all">Export all config to clipboard</string>
 
     <string name="tasker_start_service">Start Service</string>
     <string name="tasker_setting_confirm">Confirm</string>
+
+    <string name="routing_settings_title">Routing Settings</string>
+    <string name="routing_settings_tips">Separated by commas(,),remember to save</string>
+    <string name="routing_settings_save">Save</string>
+    <string name="routing_settings_delete">Clear</string>
+    <string name="routing_settings_scan_replace">Scan and replace</string>
+    <string name="routing_settings_scan_append">Scan and append</string>
 
     <string-array name="share_method">
         <item>QRcode</item>
         <item>Export to clipboard</item>
     </string-array>
+
+    <string-array name="routing_tag">
+        <item>proxy URL or IP</item>
+        <item>direct URL or IP</item>
+        <item>blocked URL or IP</item>
+    </string-array>
+
+    <string-array name="routing_mode">
+        <item>Global</item>
+        <item>Bypass mainland</item>
+        <item>Geo Family</item>
+    </string-array>
+
 </resources>

@@ -2,8 +2,6 @@ package com.v2ray.ang.dto
 
 data class AngConfig(
         var index: Int,
-        var bypassMainland: Boolean = false,
-        var muxEnabled: Boolean = false,
         var vmess: ArrayList<VmessBean>
 ) {
 //    data class VmessBean(var guid: String = "123456",
@@ -29,6 +27,8 @@ data class AngConfig(
                          var remarks: String = "hostdare",
                          var headerType: String = "none",
                          var requestHost: String = "",
+                         var path: String = "",
                          var streamSecurity: String = "",
-                         var configType: Int = 1)
+                         var configType: Int = 1,
+                         var configVersion: Int = 1)
 }

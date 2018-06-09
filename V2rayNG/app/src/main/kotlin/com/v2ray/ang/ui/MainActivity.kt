@@ -22,6 +22,12 @@ import org.jetbrains.anko.*
 import java.lang.ref.SoftReference
 import java.net.URL
 import android.content.IntentFilter
+import android.support.v7.widget.helper.ItemTouchHelper
+import rx.Observable
+import rx.android.schedulers.AndroidSchedulers
+import java.util.concurrent.TimeUnit
+import com.v2ray.ang.helper.SimpleItemTouchHelperCallback
+
 
 class MainActivity : BaseActivity() {
     companion object {
@@ -31,25 +37,27 @@ class MainActivity : BaseActivity() {
         private const val REQUEST_SCAN_URL = 3
     }
 
-    var fabChecked = false
+    var isRunning = false
         set(value) {
             field = value
             adapter.changeable = !value
             if (value) {
                 fab.imageResource = R.drawable.ic_start_connected
+                hideCircle()
             } else {
                 fab.imageResource = R.drawable.ic_start_idle
             }
         }
 
     private val adapter by lazy { MainRecyclerAdapter(this) }
+    private var mItemTouchHelper: ItemTouchHelper? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         fab.setOnClickListener {
-            if (fabChecked) {
+            if (isRunning) {
                 Utils.stopVService(this)
             } else {
                 val intent = VpnService.prepare(this)
@@ -61,18 +69,24 @@ class MainActivity : BaseActivity() {
             }
         }
 
+        recycler_view.setHasFixedSize(true)
         recycler_view.layoutManager = LinearLayoutManager(this)
         recycler_view.adapter = adapter
+
+        val callback = SimpleItemTouchHelperCallback(adapter)
+        mItemTouchHelper = ItemTouchHelper(callback)
+        mItemTouchHelper?.attachToRecyclerView(recycler_view)
     }
 
     fun startV2Ray() {
-        toast(R.string.toast_services_start)
+        showCircle()
+//        toast(R.string.toast_services_start)
         Utils.startVService(this)
     }
 
     override fun onStart() {
         super.onStart()
-        fabChecked = false
+        isRunning = false
 
 //        val intent = Intent(this.applicationContext, V2RayVpnService::class.java)
 //        intent.`package` = AppConfig.ANG_PACKAGE
@@ -138,7 +152,7 @@ class MainActivity : BaseActivity() {
             true
         }
         R.id.import_manually -> {
-            startActivity<ServerActivity>("position" to -1, "isRunning" to fabChecked)
+            startActivity<ServerActivity>("position" to -1, "isRunning" to isRunning)
             adapter.updateConfigList()
             true
         }
@@ -154,8 +168,16 @@ class MainActivity : BaseActivity() {
             importQRcode(REQUEST_SCAN_URL)
             true
         }
+        R.id.export_all -> {
+            if (AngConfigManager.shareAll2Clipboard() == 0) {
+                toast(R.string.toast_success)
+            } else {
+                toast(R.string.toast_failure)
+            }
+            true
+        }
         R.id.settings -> {
-            startActivity<SettingsActivity>("isRunning" to fabChecked)
+            startActivity<SettingsActivity>("isRunning" to isRunning)
             true
         }
         R.id.logcat -> {
@@ -175,7 +197,7 @@ class MainActivity : BaseActivity() {
                     .addCategory(Intent.CATEGORY_DEFAULT)
                     .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP), requestCode)
         } catch (e: Exception) {
-            RxPermissions.getInstance(this)
+            RxPermissions(this)
                     .request(Manifest.permission.CAMERA)
                     .subscribe {
                         if (it)
@@ -202,15 +224,31 @@ class MainActivity : BaseActivity() {
     }
 
     fun importConfig(server: String?) {
-        if (server == null) {
-            return
-        }
-        val resId = AngConfigManager.importConfig(server)
-        if (resId > 0) {
-            toast(resId)
-        } else {
-            toast(R.string.toast_success)
-            adapter.updateConfigList()
+        try {
+            if (server == null) {
+                return
+            }
+            var servers = server
+            if (server.indexOf("vmess") == server.lastIndexOf("vmess")) {
+                servers = server.replace("\n", "")
+            }
+
+            var count = 0
+            servers.lines()
+                    .forEach {
+                        val resId = AngConfigManager.importConfig(it)
+                        if (resId == 0) {
+                            count++
+                        }
+                    }
+            if (count > 0) {
+                toast(R.string.toast_success)
+                adapter.updateConfigList()
+            } else {
+                toast(R.string.toast_failure)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
@@ -284,7 +322,7 @@ class MainActivity : BaseActivity() {
      * read content from uri
      */
     private fun readContentFromUri(uri: Uri) {
-        RxPermissions.getInstance(this)
+        RxPermissions(this)
                 .request(Manifest.permission.READ_EXTERNAL_STORAGE)
                 .subscribe {
                     if (it) {
@@ -337,21 +375,21 @@ class MainActivity : BaseActivity() {
             val activity = mReference.get()
             when (intent?.getIntExtra("key", 0)) {
                 AppConfig.MSG_STATE_RUNNING -> {
-                    activity?.fabChecked = true
+                    activity?.isRunning = true
                 }
                 AppConfig.MSG_STATE_NOT_RUNNING -> {
-                    activity?.fabChecked = false
+                    activity?.isRunning = false
                 }
                 AppConfig.MSG_STATE_START_SUCCESS -> {
                     activity?.toast(R.string.toast_services_success)
-                    activity?.fabChecked = true
+                    activity?.isRunning = true
                 }
                 AppConfig.MSG_STATE_START_FAILURE -> {
                     activity?.toast(R.string.toast_services_failure)
-                    activity?.fabChecked = false
+                    activity?.isRunning = false
                 }
                 AppConfig.MSG_STATE_STOP_SUCCESS -> {
-                    activity?.fabChecked = false
+                    activity?.isRunning = false
                 }
             }
         }
@@ -363,5 +401,22 @@ class MainActivity : BaseActivity() {
             return true
         }
         return super.onKeyDown(keyCode, event)
+    }
+
+    fun showCircle() {
+        fabProgressCircle?.show()
+    }
+
+    fun hideCircle() {
+        try {
+            Observable.timer(500, TimeUnit.MILLISECONDS)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe {
+                        if (fabProgressCircle.isShown) {
+                            fabProgressCircle.hide()
+                        }
+                    }
+        } catch (e: Exception) {
+        }
     }
 }

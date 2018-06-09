@@ -9,7 +9,6 @@ import com.v2ray.ang.dto.AngConfig
 import com.v2ray.ang.util.AngConfigManager
 import com.v2ray.ang.util.Utils
 import kotlinx.android.synthetic.main.activity_server.*
-import com.v2ray.ang.extension.alert
 import org.jetbrains.anko.*
 
 
@@ -81,6 +80,7 @@ class ServerActivity : BaseActivity() {
             sp_header_type.setSelection(headerType)
         }
         et_request_host.text = Utils.getEditable(vmess.requestHost)
+        et_path.text = Utils.getEditable(vmess.path)
 
         val streamSecurity = Utils.arrayFind(streamsecuritys, vmess.streamSecurity)
         if (streamSecurity >= 0) {
@@ -103,6 +103,7 @@ class ServerActivity : BaseActivity() {
 
         sp_header_type.setSelection(0)
         et_request_host.text = null
+        et_path.text = null
         sp_stream_security.setSelection(0)
         return true
     }
@@ -124,6 +125,7 @@ class ServerActivity : BaseActivity() {
 
         vmess.headerType = headertypes[sp_header_type.selectedItemPosition]
         vmess.requestHost = et_request_host.text.toString()
+        vmess.path = et_path.text.toString()
         vmess.streamSecurity = streamsecuritys[sp_stream_security.selectedItemPosition]
 
         if (TextUtils.isEmpty(vmess.remarks)) {

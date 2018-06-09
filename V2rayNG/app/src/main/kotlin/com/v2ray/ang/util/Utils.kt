@@ -13,10 +13,17 @@ import java.util.*
 import kotlin.collections.HashMap
 import android.app.ActivityManager
 import android.content.ClipData
+import android.content.Intent
+import android.net.Uri
+import android.text.TextUtils
 import android.util.Patterns
 import android.webkit.URLUtil
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.R
 import com.v2ray.ang.service.V2RayVpnService
+import com.v2ray.ang.ui.SettingsActivity
+import me.dozen.dpreference.DPreference
+import org.jetbrains.anko.toast
 
 object Utils {
 
@@ -97,7 +104,7 @@ object Utils {
      */
     fun encode(text: String): String {
         try {
-            return Base64.encodeToString(text.toByteArray(charset("UTF-8")), Base64.DEFAULT)
+            return Base64.encodeToString(text.toByteArray(charset("UTF-8")), Base64.NO_WRAP)
         } catch (e: Exception) {
             e.printStackTrace()
             return ""
@@ -105,19 +112,39 @@ object Utils {
     }
 
     /**
-     * get dns servers
+     * get remote dns servers from preference
      */
-    fun getDnsServers(): Array<out String> {
-        val ret = LinkedHashSet<String>()
-        ret.add("8.8.8.8")
-        ret.add("8.8.4.4")
-        return ret.toTypedArray()
+    fun getRemoteDnsServers(defaultDPreference: DPreference): List<String> {
+        val remoteDns = defaultDPreference.getPrefString(SettingsActivity.PREF_REMOTE_DNS, "")
+        val ret = ArrayList<String>()
+        if (!TextUtils.isEmpty(remoteDns)) {
+            remoteDns
+                    .split(",")
+                    .forEach {
+                        if (Utils.isIpAddress(it)) {
+                            ret.add(it)
+                        }
+                    }
+        }
+
+        if (ret.size <= 0) {
+            if (!ret.contains("8.8.8.8")) {
+                ret.add("8.8.8.8")
+            }
+            if (!ret.contains("8.8.4.4")) {
+                ret.add("8.8.4.4")
+            }
+        }
+//        if (!ret.contains("localhost")) {
+//            ret.add("localhost")
+//        }
+        return ret
     }
 
     /**
      * create qrcode using zxing
      */
-    fun createQRCode(text: String, size: Int = 500): Bitmap? {
+    fun createQRCode(text: String, size: Int = 800): Bitmap? {
         try {
             val hints = HashMap<EncodeHintType, String>()
             hints.put(EncodeHintType.CHARACTER_SET, "utf-8")
@@ -226,6 +253,7 @@ object Utils {
      * startVService
      */
     fun startVService(context: Context): Boolean {
+        context.toast(R.string.toast_services_start)
         if (AngConfigManager.genStoreV2rayConfig()) {
             V2RayVpnService.startV2Ray(context)
             return true
@@ -254,7 +282,13 @@ object Utils {
      * stopVService
      */
     fun stopVService(context: Context) {
+        context.toast(R.string.toast_services_stop)
         MessageUtil.sendMsg2Service(context, AppConfig.MSG_STATE_STOP, "")
+    }
+
+    fun openUri(context: Context, uriString: String) {
+        val uri = Uri.parse(uriString)
+        context.startActivity(Intent(Intent.ACTION_VIEW, uri))
     }
 }
 

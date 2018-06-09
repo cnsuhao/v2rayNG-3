@@ -35,7 +35,8 @@
     <string name="server_lab_network">传输协议(network)</string>
     <string name="server_lab_more_function">功能设置（不清楚则保持默认值）</string>
     <string name="server_lab_head_type">伪装类型(type)</string>
-    <string name="server_lab_request_host">伪装域名/ws path/ws(path+host)分号(;)隔开</string>
+    <string name="server_lab_request_host">伪装域名host(host/ws host/h2 host)</string>
+    <string name="server_lab_path">path(ws path/h2 path)</string>
     <string name="server_lab_stream_security">底层传输安全</string>
     <string name="toast_success">成功</string>
     <string name="toast_failure">失败</string>
@@ -61,14 +62,14 @@
     <string name="title_about">关于</string>
     <string name="title_advanced">进阶设置</string>
 
-    <string name="title_pref_bypass_mainland">绕过大陆地址</string>
-    <string name="summary_pref_bypass_mainland">绕过大陆地址</string>
-
     <string name="title_pref_per_app_proxy">分应用代理</string>
     <string name="summary_pref_per_app_proxy">分应用代理仅支持 Android 5.0 Lollipop 及更高</string>
 
     <string name="title_pref_mux_enabled">开启Mux多路复用</string>
     <string name="summary_pref_mux_enabled">开启可能会加速,关闭可能会减少断流</string>
+
+    <string name="title_pref_routing">路由</string>
+    <string name="summary_pref_routing">自定义路由</string>
 
     <string name="title_pref_donate">捐赠</string>
     <string name="summary_pref_donate">支持开发者</string>
@@ -76,6 +77,9 @@
 
     <string name="title_pref_remote_dns">远程DNS</string>
     <string name="summary_pref_remote_dns">远程DNS</string>
+
+    <string name="title_pref_speedup_domain">加速域名解析</string>
+    <string name="summary_pref_speedup_domain">直连解析,可能存在问题,http/tls有效</string>
 
     <string name="title_pref_feedback">反馈</string>
     <string name="summary_pref_feedback">反馈改进或漏洞至 GitHub</string>
@@ -88,15 +92,37 @@
     <string name="donate_error_purchase2">错误,真实性验证失败.</string>
     <string name="donate_success_purchase">感谢您的捐赠!</string>
     <string name="donate_item_click">捐赠</string>
+    <string name="donate_item_paypal">Paypal</string>
 
     <string name="title_logcat">Logcat</string>
     <string name="logcat_copy">复制</string>
+    <string name="title_export_all">导出全部配置至剪贴板</string>
 
     <string name="tasker_start_service">启动服务</string>
     <string name="tasker_setting_confirm">确定</string>
+
+    <string name="routing_settings_title">路由设置</string>
+    <string name="routing_settings_tips">用逗号(,)隔开,可以一行多个,记得保存</string>
+    <string name="routing_settings_save">保存</string>
+    <string name="routing_settings_delete">清空</string>
+    <string name="routing_settings_scan_replace">扫描并替换</string>
+    <string name="routing_settings_scan_append">扫描并追加</string>
 
     <string-array name="share_method">
         <item>二维码</item>
         <item>导出至剪贴板</item>
     </string-array>
+
+    <string-array name="routing_tag">
+        <item>代理的网址或IP</item>
+        <item>直连的网址或IP</item>
+        <item>阻止的网址或IP</item>
+    </string-array>
+
+    <string-array name="routing_mode">
+        <item>全局</item>
+        <item>绕过大陆地址</item>
+        <item>Geo全家桶</item>
+    </string-array>
+
 </resources>
